@@ -1,3 +1,4 @@
+import ActionInfo from "./action-info/action-info";
 import PlayerCard from "./player-card";
 
 const PlayerCircles = () => {
@@ -32,7 +33,10 @@ const PlayerCircles = () => {
     <div className="flex flex-col items-center justify-end h-screen">
       <div className="flex justify-center items-center h-16 bg-gray-100 border-t-4 border-gray-300">
         {players.map((player) => (
-          <PlayerCard player={player} key={player.id} />
+          <div key={player.id}>
+            <ActionInfo player={player} />
+            <PlayerCard player={player} />
+          </div>
         ))}
       </div>
     </div>

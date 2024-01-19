@@ -6,9 +6,11 @@ export default function AuthenticatedLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <div className="flex flex-col h-screen">
       <Header />
-      <section>{children}</section>
+      <section className="flex flex-col flex-grow overflow-y-auto">
+        {children}
+      </section>
     </div>
   );
 }

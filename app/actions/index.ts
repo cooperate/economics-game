@@ -116,3 +116,71 @@ export async function fetchGameIdFromRoom(roomId: string) {
 
   return roomData.game_id;
 }
+
+export async function markPlayerAsReady(gamePhaseId: string, playerId: string) {
+  // Fetch the current state of ready_players for the game phase
+  const { data, error } = await supabase
+    .from('game_phases')
+    .select('ready_players')
+    .eq('phase_id', gamePhaseId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching ready players:', error);
+    return;
+  }
+
+  // Update the ready_players JSON
+  const updatedReadyPlayers = {
+    ...data.ready_players,
+    [playerId]: true
+  };
+
+  // Update the database
+  const { error: updateError } = await supabase
+    .from('game_phases')
+    .update({ ready_players: updatedReadyPlayers })
+    .eq('phase_id', gamePhaseId);
+
+  if (updateError) {
+    console.error('Error updating ready players:', updateError);
+  }
+};
+
+export async function checkAllPlayersReady(gameId: string, phaseId: string) {
+  // Fetch the number of players in the game
+  const { data: playerData, error: playerError } = await supabase
+    .from('game_players')
+    .select('player_id', { count: 'exact' })
+    .eq('game_id', gameId);
+
+  if (playerError) {
+    console.error('Error fetching player count:', playerError);
+    return;
+  }
+
+  // Fetch the ready players from the game phase
+  const { data: phaseData, error: phaseError } = await supabase
+    .from('game_phases')
+    .select('ready_players')
+    .eq('phase_id', phaseId)
+    .single();
+
+  if (phaseError) {
+    console.error('Error fetching game phase:', phaseError);
+    return;
+  }
+
+  const playerCount = playerData.length;
+  const readyPlayerCount = Object.keys(phaseData.ready_players || {}).length;
+
+  // Check if all players are ready
+  if (playerCount === readyPlayerCount) {
+    advancePhase(gameId, phaseId);
+  }
+};
+
+
+export async function advancePhase(gameId: string, phase: any) {
+  
+};
